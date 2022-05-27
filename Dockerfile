@@ -1,0 +1,17 @@
+FROM python:3.10-bullseye as base
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV POETRY_VERSION 1.1.12
+
+RUN pip install "poetry==$POETRY_VERSION"
+
+COPY pyproject.toml poetry.lock ./
+
+RUN poetry export -f requirements.txt | pip install --no-cache-dir -r /dev/stdin
+
+FROM base as dev
+
+WORKDIR /gotracker
+
+ENTRYPOINT [ "/bin/sh", "-c", "flask run --host 0.0.0.0 --port 5000" ]

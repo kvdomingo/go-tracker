@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "go-tracker"
+version = "0.1.0"
+description = ""
+authors = ["Kenneth V. Domingo <hello@kvdomingo.xyz>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^2.1.2"
+gunicorn = {extras = ["gevent"], version = "^20.1.0"}
+python-dotenv = "^0.20.0"
+loguru = "^0.6.0"
+redis = "^4.3.1"
+redis-om = "^0.0.27"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.black]
+line-length = 120
+target-version = ["py310"]

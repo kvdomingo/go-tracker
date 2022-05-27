@@ -1,0 +1,30 @@
+version: '3'
+
+env:
+  NAME: go-tracker-dev
+
+tasks:
+  default:
+    desc: Build and start Docker containers
+    cmds:
+      - docker compose -p $NAME up -d --build --remove-orphans {{.CLI_ARGS}}
+
+  logs:
+    desc: Attach to Docker logs
+    cmds:
+      - docker compose -p $NAME logs --follow {{.CLI_ARGS}}
+
+  shutdown:
+    desc: Stop containers
+    cmds:
+      - docker compose -p $NAME stop
+
+  restart:
+    desc: Restart containers
+    cmds:
+      - docker compose -p $NAME restart {{.CLI_ARGS}}
+
+  clean:
+    desc: Remove containers
+    cmds:
+      - docker compose -p $NAME down -v --remove-orphans

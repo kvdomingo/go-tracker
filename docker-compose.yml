@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      target: dev
+    image: kvdomingo/go-tracker-api:latest
+    env_file: .env
+    volumes:
+      - .:/gotracker
+
+  frontend:
+    build: ./web/app
+    image: kvdomingo/go-tracker-web:latest
+    environment:
+      - HOST=0.0.0.0
+      - PORT=3000
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - TSC_WATCHFILE=UseFsEventsWithFallbackDynamicPolling
+      - WDS_SOCKET_PORT=0
+    volumes:
+      - ./web/app:/web
+
+  redis:
+    image: redis/redis-stack-server:latest
+    volumes:
+      - db-data:/data
+
+  proxy:
+    image: bitnami/nginx:latest
+    volumes:
+      - ./proxy/nginx.conf:/opt/bitnami/nginx/conf/server_blocks/gotracker.conf:ro
+    environment:
+      - NGINX_HTTP_PORT_NUMBER=8000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotracker-dev.rule=Host(`go-tracker-dev.localhost`)"
+      - "traefik.http.routers.gotracker-dev.entrypoints=web"
+      - "traefik.docker.network=dev"
+      - "traefik.http.services.gotracker-dev.loadbalancer.server.port=8000"
+    networks:
+      - default
+      - dev
+    restart: unless-stopped
+
+networks:
+  dev:
+    external: true
+
+volumes:
+  db-data:
