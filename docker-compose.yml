@@ -24,9 +24,18 @@ services:
       - ./web/app:/web
 
   redis:
-    image: redis/redis-stack-server:latest
+    image: redis/redis-stack:latest
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotracker-redisinsight-dev.rule=Host(`redisinsight.go-tracker-dev.localhost`)"
+      - "traefik.http.routers.gotracker-redisinsight-dev.entrypoints=web"
+      - "traefik.docker.network=dev"
+      - "traefik.http.services.gotracker-redisinsight-dev.loadbalancer.server.port=8001"
     volumes:
       - db-data:/data
+    networks:
+      - default
+      - dev
 
   proxy:
     image: bitnami/nginx:latest

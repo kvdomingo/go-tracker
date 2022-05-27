@@ -1,14 +1,15 @@
-from enum import Enum
+from enum import IntEnum
 from datetime import datetime
-from redis_om import JsonModel, Field
+from redis_om import JsonModel, Field, Migrator
 from typing import Optional
+from .provider import Provider
 
 
 def get_timestamp():
     return int(datetime.utcnow().timestamp() * 1000)
 
 
-class OrderStatus(Enum):
+class OrderStatus(IntEnum):
     UNPAID = 0
     PARTIALLY_PAID = 1
     FULLY_PAID = 2
@@ -18,9 +19,12 @@ class OrderStatus(Enum):
 
 class GroupOrder(JsonModel):
     item: str
-    provider_name: str
+    provider: Provider
     order_number: str
     order_date: int = Field(default_factory=get_timestamp)
     downpayment_deadline: Optional[datetime]
     payment_deadline: datetime
-    status: OrderStatus
+    status: OrderStatus = Field(index=True)
+
+
+Migrator().run()
