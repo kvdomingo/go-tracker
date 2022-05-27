@@ -17,12 +17,17 @@ tasks:
   shutdown:
     desc: Stop containers
     cmds:
-      - docker compose -p $NAME stop
+      - docker compose -p $NAME stop {{.CLI_ARGS}}
 
   restart:
     desc: Restart containers
     cmds:
       - docker compose -p $NAME restart {{.CLI_ARGS}}
+
+  exec:
+    desc: Run a command in the specified container
+    cmds:
+      - docker compose -p $NAME exec -- {{.CLI_ARGS}}
 
   clean:
     desc: Remove containers

@@ -1,25 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect } from "react";
+import { Container } from "@mui/material";
+import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import OrderTableToolbar from "./components/shared/OrderTableToolbar";
+import useGetProviders from "./api/hooks/useGetProviders";
+import useGetGroupOrders from "./api/hooks/useGetGroupOrders";
 
 function App() {
+  const { data: providers, getProviders } = useGetProviders();
+  const { data: orders, getGroupOrders } = useGetGroupOrders();
+  const columns: GridColDef[] = [
+    {
+      field: "item",
+      headerName: "Item",
+      flex: 1,
+      type: "string",
+    },
+  ];
+
+  useEffect(() => {
+    getProviders();
+  }, []);
+
+  useEffect(() => {
+    getGroupOrders();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container maxWidth={false}>
+      <DataGrid columns={columns} rows={orders} components={{ Toolbar: OrderTableToolbar }} />
+    </Container>
   );
 }
 

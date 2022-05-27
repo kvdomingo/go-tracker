@@ -22,8 +22,8 @@ class GroupOrder(JsonModel):
     provider: Provider
     order_number: str
     order_date: int = Field(default_factory=get_timestamp)
-    downpayment_deadline: Optional[datetime]
-    payment_deadline: datetime
+    downpayment_deadline: Optional[int]
+    payment_deadline: int
     status: OrderStatus = Field(index=True)
 
 
