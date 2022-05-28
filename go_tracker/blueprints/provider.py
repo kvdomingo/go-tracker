@@ -12,8 +12,8 @@ provider = Blueprint("provider", __name__)
 def list_providers():
     match request.method:
         case "GET":
-            providers = [Provider.get(pk).dict() for pk in Provider.all_pks()]
-            return jsonify(providers)
+            providers: list[Provider] = sorted([Provider.get(pk) for pk in Provider.all_pks()], key=lambda p: p.name)
+            return jsonify([provider.dict() for provider in providers])
         case "POST":
             req = request.json
             if not req:

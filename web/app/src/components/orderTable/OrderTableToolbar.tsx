@@ -8,7 +8,11 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 
-function OrderTableToolbar() {
+interface Props {
+  showOrderDialog: () => void;
+}
+
+function OrderTableToolbar({ showOrderDialog }: Props) {
   return (
     <GridToolbarContainer>
       <Grid container>
@@ -22,7 +26,7 @@ function OrderTableToolbar() {
           <Button variant="text" size="small" startIcon={<AddIcon />} sx={{ mr: 2 }}>
             Add Provider
           </Button>
-          <Button variant="text" size="small" startIcon={<AddIcon />}>
+          <Button variant="text" size="small" startIcon={<AddIcon />} onClick={showOrderDialog}>
             Add Order
           </Button>
         </Grid>

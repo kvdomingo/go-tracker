@@ -1,5 +1,5 @@
 export interface Provider {
-  id: string;
+  pk: string;
   name: string;
   website: string;
 }

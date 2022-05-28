@@ -13,11 +13,13 @@ def list_orders():
     match request.method:
         case "GET":
             show_done = request.args.get("show_done", False)
+            orders: list[GroupOrder]
             if show_done:
-                orders = [GroupOrder.get(pk).dict() for pk in GroupOrder.all_pks()]
+                orders = [GroupOrder.get(pk) for pk in GroupOrder.all_pks()]
             else:
-                orders = [order.dict() for order in GroupOrder.find(GroupOrder.status != OrderStatus.DELIVERED).all()]
-            return jsonify(orders)
+                orders = [order for order in GroupOrder.find(GroupOrder.status != OrderStatus.DELIVERED).all()]
+            orders = sorted(orders, key=lambda o: o.item)
+            return jsonify([order.dict() for order in orders])
         case "POST":
             req = request.json
             if not req:
