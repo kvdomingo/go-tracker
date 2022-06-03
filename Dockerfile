@@ -15,3 +15,29 @@ FROM base as dev
 WORKDIR /gotracker
 
 ENTRYPOINT [ "flask", "run", "--host=0.0.0.0", "--port=5000" ]
+
+FROM node:16-alpine as build
+
+WORKDIR /web
+
+COPY ./web/app/package.json ./web/app/tsconfig.json ./web/app/yarn.lock ./
+
+RUN yarn --prod
+
+COPY ./web/app/src/ ./src/
+COPY ./web/app/public/ ./public/
+
+RUN yarn build
+
+FROM base as prod
+
+COPY ./go_tracker/ ./go_tracker/
+COPY --from=build ./web/build/ ./web/app/
+COPY ./*.py ./
+COPY ./*.sh ./
+
+RUN chmod +x docker-entrypoint.sh
+
+EXPOSE $PORT
+
+ENTRYPOINT [ "./docker-entrypoint.sh" ]

@@ -9,6 +9,8 @@ services:
     env_file: .env
     volumes:
       - .:/gotracker
+    depends_on:
+      - redis
 
   frontend:
     build: ./web/app

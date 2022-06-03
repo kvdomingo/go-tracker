@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build: .
+    image: kvdomingo/go-tracker-prod:latest
+    environment:
+      - PORT=${PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_OM_URL=${REDIS_OM_URL}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotracker-prod.rule=Host(`go-tracker.localhost`)"
+      - "traefik.http.routers.gotracker-prod.entrypoints=web"
+      - "traefik.docker.network=dev"
+      - "traefik.http.services.gotracker-prod.loadbalancer.server.port=${PORT}"
+    networks:
+      - default
+      - dev
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  redis:
+    image: redis/redis-stack-server:latest
+    volumes:
+      - db-data:/data
+
+networks:
+  dev:
+    external: true
+
+volumes:
+  db-data:

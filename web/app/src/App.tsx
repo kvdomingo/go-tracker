@@ -1,31 +1,21 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import OrderTable from "./components/orderTable/OrderTable";
-import {
-  Box,
-  Container,
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  MenuItem,
-  Select,
-  ThemeProvider,
-} from "@mui/material";
+import { Box, Container, ThemeProvider } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { GroupOrder, ReverseOrderStatus } from "./api/types/groupOrder";
-import { Provider } from "./api/types/provider";
 import { GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
 import dateFormat from "dateformat";
 import OrderDialog from "./components/orderDialog/OrderDialog";
+import ProviderDialog from "./components/providerDialog/ProviderDialog";
+import { updateOrders, updateProviders, useTrackerContext } from "./providers/TrackerProvider";
 import theme from "./themes";
 import api from "./api";
 
 function App() {
-  const [providers, setProviders] = useState<Provider[]>([]);
-  const [orders, setOrders] = useState<GroupOrder[]>([]);
+  const { dispatch } = useTrackerContext();
   const [showOrderDialog, setShowOrderDialog] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [showProviderDialog, setShowProviderDialog] = useState(false);
+  const [editing, setEditing] = useState("");
   const columns: GridColumns<GroupOrder> = [
     {
       field: "item",
@@ -88,17 +78,6 @@ function App() {
           {ReverseOrderStatus[params.value].label.replace("_", " ")}
         </Box>
       ),
-      // renderEditCell: ({ value, row }) => (
-      //   <FormControl fullWidth>
-      //     <Select value={value} onChange={e => handlePatchOrder(row.pk, "status", e.target.value)}>
-      //       {ReverseOrderStatus.map((status, i) => (
-      //         <MenuItem key={status.label} value={i}>
-      //           {status.label.replace("_", " ")}
-      //         </MenuItem>
-      //       ))}
-      //     </Select>
-      //   </FormControl>
-      // ),
     },
     {
       field: "pk",
@@ -110,11 +89,11 @@ function App() {
           icon={<EditIcon />}
           label="Edit"
           onClick={() => {
-            setIsEditing(true);
+            setEditing(params.id as string);
             setShowOrderDialog(true);
           }}
         />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={() => {}} />,
+        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={() => handleDelete(params.id as string)} />,
       ],
     },
   ];
@@ -122,22 +101,39 @@ function App() {
   useEffect(() => {
     Promise.all([api.provider.list(), api.groupOrder.list()])
       .then(([rProvider, rGroupOrder]) => {
-        setProviders(rProvider.data);
-        setOrders(rGroupOrder.data);
+        dispatch({
+          type: updateProviders,
+          payload: rProvider.data,
+        });
+        dispatch({
+          type: updateOrders,
+          payload: rGroupOrder.data,
+        });
       })
       .catch(err => console.error(err));
-  }, []);
+  }, [dispatch]);
 
-  function handlePatchOrder(pk: string, key: keyof GroupOrder, value: GroupOrder[keyof GroupOrder]) {
+  function handleDelete(pk: string) {
     api.groupOrder
-      .patch(pk, key, value)
-      .then(res => {
-        let orders_ = [...orders];
-        let oldOrderIndex = orders_.findIndex(o => o.pk === pk);
-        orders_[oldOrderIndex] = res.data;
-        setOrders([...orders_]);
+      .delete(pk)
+      .then(() => {
+        api.groupOrder
+          .list()
+          .then(res =>
+            dispatch({
+              type: updateOrders,
+              payload: res.data,
+            }),
+          )
+          .catch(err => {
+            console.error(err.message);
+            alert("A network error occurred.");
+          });
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err.message);
+        alert("A network error occurred.");
+      });
   }
 
   return (
@@ -145,23 +141,27 @@ function App() {
       <Container maxWidth={false}>
         <OrderTable
           columns={columns}
-          rows={orders}
           showOrderDialog={() => {
-            setIsEditing(false);
+            setEditing("");
             setShowOrderDialog(true);
           }}
+          showProviderDialog={() => setShowProviderDialog(true)}
         />
         <OrderDialog
           open={showOrderDialog}
           onClose={() => {
             setShowOrderDialog(false);
-            setIsEditing(false);
+            setEditing("");
           }}
-          handleSubmit={() => {}}
           maxWidth="md"
           fullWidth
-          isEditing={isEditing}
-          providers={providers}
+          editing={editing}
+        />
+        <ProviderDialog
+          open={showProviderDialog}
+          onClose={() => setShowProviderDialog(false)}
+          maxWidth="md"
+          fullWidth
         />
       </Container>
     </ThemeProvider>

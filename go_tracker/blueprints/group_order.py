@@ -28,12 +28,12 @@ def list_orders():
                 if req.get("provider") is None:
                     return Response("Error: provider is required", status=status.BAD_REQUEST)
                 else:
-                    provider = req.pop("provider")
+                    pk = req.get("provider")["pk"]
                 try:
-                    provider = Provider.get(provider)
+                    provider = Provider.get(pk)
                 except NotFoundError:
                     return Response(
-                        f'Error: Provider with id "{provider}" not found',
+                        f'Error: Provider with id "{pk}" not found',
                         status=status.BAD_REQUEST,
                     )
                 req.update({"provider": provider})

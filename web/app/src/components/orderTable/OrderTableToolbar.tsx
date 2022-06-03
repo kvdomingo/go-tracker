@@ -10,9 +10,10 @@ import {
 
 interface Props {
   showOrderDialog: () => void;
+  showProviderDialog: () => void;
 }
 
-function OrderTableToolbar({ showOrderDialog }: Props) {
+function OrderTableToolbar({ showOrderDialog, showProviderDialog }: Props) {
   return (
     <GridToolbarContainer>
       <Grid container>
@@ -23,7 +24,7 @@ function OrderTableToolbar({ showOrderDialog }: Props) {
           <GridToolbarExport />
         </Grid>
         <Grid item xs container justifyContent="flex-end">
-          <Button variant="text" size="small" startIcon={<AddIcon />} sx={{ mr: 2 }}>
+          <Button variant="text" size="small" startIcon={<AddIcon />} sx={{ mr: 2 }} onClick={showProviderDialog}>
             Add Provider
           </Button>
           <Button variant="text" size="small" startIcon={<AddIcon />} onClick={showOrderDialog}>

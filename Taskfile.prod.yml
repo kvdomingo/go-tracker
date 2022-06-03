@@ -1,0 +1,33 @@
+version: '3'
+
+env:
+  NAME: go-tracker-prod
+
+dotenv:
+  - .env.prod
+
+tasks:
+  default:
+    desc: Build and start prod Docker containers
+    cmds:
+      - docker-compose -p $NAME -f docker-compose.prod.yml up -d --build --remove-orphans
+
+  logs:
+    desc: Attach to prod Docker logs
+    cmds:
+      - docker compose -p $NAME -f docker-compose.prod.yml logs --follow
+
+  shutdown:
+    desc: Stop prod containers
+    cmds:
+      - docker-compose -p $NAME -f docker-compose.prod.yml stop
+
+  restart:
+    desc: Restart prod containers
+    cmds:
+      - docker-compose -p $NAME -f docker-compose.prod.yml restart
+
+  clean:
+    desc: Remove prod containers
+    cmds:
+      - docker-compose -p $NAME -f docker-compose.prod.yml down --remove-orphans
