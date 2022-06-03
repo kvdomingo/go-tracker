@@ -36,8 +36,6 @@ COPY --from=build ./web/build/ ./web/app/
 COPY ./*.py ./
 COPY ./*.sh ./
 
-RUN chmod +x docker-entrypoint.sh
-
 EXPOSE $PORT
 
-ENTRYPOINT [ "./docker-entrypoint.sh" ]
+ENTRYPOINT [ "sh", "./docker-entrypoint.sh" ]

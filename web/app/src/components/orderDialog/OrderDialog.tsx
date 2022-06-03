@@ -114,7 +114,7 @@ function OrderDialog({ editing, ...props }: Props) {
       .create(form_)
       .then(() => {
         getOrders();
-        props.onClose!(e, "backdropClick");
+        handleClose(e);
       })
       .catch(err => {
         console.error(err.message);
@@ -133,7 +133,7 @@ function OrderDialog({ editing, ...props }: Props) {
       .update(editing, form_)
       .then(() => {
         getOrders();
-        props.onClose!(e, "backdropClick");
+        handleClose(e);
       })
       .catch(err => console.error(err));
   }
