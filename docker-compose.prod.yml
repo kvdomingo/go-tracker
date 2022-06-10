@@ -1,5 +1,9 @@
 version: '3.8'
 
+networks:
+  gateway:
+    external: true
+
 services:
   backend:
     build: .
@@ -13,12 +17,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gotracker-prod.rule=Host(`go-tracker.localhost`)"
-      - "traefik.http.routers.gotracker-prod.entrypoints=web"
-      - "traefik.docker.network=dev"
+      - "traefik.http.routers.gotracker-prod.entrypoints=http"
+      - "traefik.docker.network=gateway"
       - "traefik.http.services.gotracker-prod.loadbalancer.server.port=${PORT}"
     networks:
       - default
-      - dev
+      - gateway
     restart: unless-stopped
     depends_on:
       - redis
@@ -28,10 +32,6 @@ services:
     volumes:
       - db-data:/data
     restart: unless-stopped
-
-networks:
-  dev:
-    external: true
 
 volumes:
   db-data:
