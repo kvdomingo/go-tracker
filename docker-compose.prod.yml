@@ -9,20 +9,11 @@ services:
     build: .
     image: kvdomingo/go-tracker-prod:latest
     environment:
-      - PORT=${PORT}
+      - PORT=5000
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_OM_URL=${REDIS_OM_URL}
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.gotracker-prod.rule=Host(`go-tracker.localhost`)"
-      - "traefik.http.routers.gotracker-prod.entrypoints=http"
-      - "traefik.docker.network=gateway"
-      - "traefik.http.services.gotracker-prod.loadbalancer.server.port=${PORT}"
-    networks:
-      - default
-      - gateway
     restart: unless-stopped
     depends_on:
       - redis
@@ -31,6 +22,23 @@ services:
     image: redis/redis-stack-server:latest
     volumes:
       - db-data:/data
+    restart: unless-stopped
+
+  proxy:
+    image: bitnami/nginx:latest
+    volumes:
+      - ./proxy/nginx.prod.conf:/opt/bitnami/nginx/conf/server_blocks/gotracker.conf:ro
+    environment:
+      - NGINX_HTTP_PORT_NUMBER=${PORT}
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gotracker-dev.rule=Host(`go-tracker.localhost`)"
+      - "traefik.http.routers.gotracker-dev.entrypoints=http"
+      - "traefik.docker.network=gateway"
+      - "traefik.http.services.gotracker-dev.loadbalancer.server.port=${PORT}"
+    networks:
+      - default
+      - gateway
     restart: unless-stopped
 
 volumes:
