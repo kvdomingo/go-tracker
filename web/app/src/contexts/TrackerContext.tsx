@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { Provider } from "../api/types/provider";
 import { GroupOrder } from "../api/types/groupOrder";
+import { Provider } from "../api/types/provider";
 
 export interface TrackerState {
   providers: Provider[];

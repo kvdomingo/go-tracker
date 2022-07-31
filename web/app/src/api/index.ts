@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
-import { Provider, ProviderForm } from "./types/provider";
 import { GroupOrder, GroupOrderBody } from "./types/groupOrder";
+import { Provider, ProviderForm } from "./types/provider";
 
 const baseURL = "/api";
 

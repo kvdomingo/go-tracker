@@ -30,14 +30,14 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gotracker-redisinsight-dev.rule=Host(`redisinsight.go-tracker-dev.localhost`)"
-      - "traefik.http.routers.gotracker-redisinsight-dev.entrypoints=web"
-      - "traefik.docker.network=dev"
+      - "traefik.http.routers.gotracker-redisinsight-dev.entrypoints=http"
+      - "traefik.docker.network=gateway"
       - "traefik.http.services.gotracker-redisinsight-dev.loadbalancer.server.port=8001"
     volumes:
       - db-data:/data
     networks:
       - default
-      - dev
+      - gateway
 
   proxy:
     image: bitnami/nginx:latest
@@ -48,16 +48,16 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gotracker-dev.rule=Host(`go-tracker-dev.localhost`)"
-      - "traefik.http.routers.gotracker-dev.entrypoints=web"
-      - "traefik.docker.network=dev"
+      - "traefik.http.routers.gotracker-dev.entrypoints=http"
+      - "traefik.docker.network=gateway"
       - "traefik.http.services.gotracker-dev.loadbalancer.server.port=8000"
     networks:
       - default
-      - dev
+      - gateway
     restart: unless-stopped
 
 networks:
-  dev:
+  gateway:
     external: true
 
 volumes:

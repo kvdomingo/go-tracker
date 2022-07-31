@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import OrderTable from "./components/orderTable/OrderTable";
+import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { Box, Container, ThemeProvider } from "@mui/material";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { GroupOrder, ReverseOrderStatus } from "./api/types/groupOrder";
 import { GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
 import dateFormat from "dateformat";
+import api from "./api";
+import { GroupOrder, ReverseOrderStatus } from "./api/types/groupOrder";
 import OrderDialog from "./components/orderDialog/OrderDialog";
+import OrderTable from "./components/orderTable/OrderTable";
 import ProviderDialog from "./components/providerDialog/ProviderDialog";
 import { updateOrders, updateProviders, useTrackerContext } from "./providers/TrackerProvider";
 import theme from "./themes";
-import api from "./api";
 
 function App() {
   const { dispatch } = useTrackerContext();
@@ -56,6 +56,20 @@ function App() {
       flex: 1,
       type: "date",
       valueFormatter: params => dateFormat(new Date(params.value), "dd mmm yyyy"),
+    },
+    {
+      field: "total_balance",
+      headerName: "Total Balance",
+      flex: 1,
+      type: "number",
+      valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
+    },
+    {
+      field: "remaining_balance",
+      headerName: "Remaining Balance",
+      flex: 1,
+      type: "number",
+      valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
     },
     {
       field: "status",

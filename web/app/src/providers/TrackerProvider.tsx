@@ -1,5 +1,5 @@
 import { useContext, useReducer } from "react";
-import TrackerContext, { TrackerState, PayloadAction } from "../contexts/TrackerContext";
+import TrackerContext, { PayloadAction, TrackerState } from "../contexts/TrackerContext";
 
 export const updateProviders = "updateProviders";
 

@@ -8,6 +8,7 @@ tasks:
     desc: Build and start Docker containers
     cmds:
       - docker compose -p $NAME up -d --build --remove-orphans {{.CLI_ARGS}}
+      - task logs
 
   logs:
     desc: Attach to Docker logs

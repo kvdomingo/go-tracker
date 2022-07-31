@@ -1,3 +1,4 @@
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import {
   Button,
   Dialog,
@@ -7,19 +8,19 @@ import {
   DialogTitle,
   FormControl,
   Grid,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
   TextField,
 } from "@mui/material";
-import { GroupOrderBody, GroupOrderForm, OrderStatus, ReverseOrderStatus } from "../../api/types/groupOrder";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import TrackerContext from "../../contexts/TrackerContext";
-import api from "../../api";
-import { updateOrders } from "../../providers/TrackerProvider";
 import moment from "moment";
+import api from "../../api";
+import { GroupOrderBody, GroupOrderForm, OrderStatus, ReverseOrderStatus } from "../../api/types/groupOrder";
+import TrackerContext from "../../contexts/TrackerContext";
+import { updateOrders } from "../../providers/TrackerProvider";
 
 interface Props extends DialogProps {
   editing: string;
@@ -35,6 +36,8 @@ function OrderDialog({ editing, ...props }: Props) {
     payment_deadline: null,
     provider: null,
     status: 0,
+    total_balance: 0.0,
+    remaining_balance: 0.0,
   };
   const initialErrorsState = {
     order_number: false,
@@ -44,6 +47,8 @@ function OrderDialog({ editing, ...props }: Props) {
     payment_deadline: false,
     provider: false,
     status: false,
+    total_balance: false,
+    remaining_balance: false,
   };
 
   const [form, setForm] = useState<GroupOrderForm>({ ...initialFormState });
@@ -65,7 +70,11 @@ function OrderDialog({ editing, ...props }: Props) {
 
   function handleChange(e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) {
     const { name, value } = e.target;
-    setForm(form => ({ ...form, [name]: value }));
+    if (["total_balance", "remaining_balance"].includes(name)) {
+      setForm(form => ({ ...form, [name]: parseFloat(value) }));
+    } else {
+      setForm(form => ({ ...form, [name]: value }));
+    }
   }
 
   function preSubmitValidate(e: any) {
@@ -99,7 +108,6 @@ function OrderDialog({ editing, ...props }: Props) {
       )
       .catch(err => {
         console.error(err.message);
-        alert("A network error occurred.");
       });
   }
 
@@ -118,7 +126,6 @@ function OrderDialog({ editing, ...props }: Props) {
       })
       .catch(err => {
         console.error(err.message);
-        alert("A network error occurred.");
       });
   }
 
@@ -285,6 +292,45 @@ function OrderDialog({ editing, ...props }: Props) {
                     ))}
                   </Select>
                 </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  type="number"
+                  variant="filled"
+                  value={form.total_balance.toFixed(2)}
+                  error={errors.total_balance}
+                  helperText={errors.total_balance && "This field is required"}
+                  fullWidth
+                  label="Total Amount"
+                  name="total_balance"
+                  onChange={handleChange}
+                  required
+                  inputMode="decimal"
+                  InputProps={{
+                    "inputMode": "decimal",
+                    "aria-valuemin": 0,
+                    "startAdornment": <InputAdornment position="start">P</InputAdornment>,
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <TextField
+                  type="number"
+                  variant="filled"
+                  value={form.remaining_balance.toFixed(2)}
+                  error={errors.remaining_balance}
+                  helperText={errors.remaining_balance && "This field is required"}
+                  fullWidth
+                  label="Remaining Balance"
+                  name="remaining_balance"
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    "inputMode": "decimal",
+                    "aria-valuemin": 0,
+                    "startAdornment": <InputAdornment position="start">P</InputAdornment>,
+                  }}
+                />
               </Grid>
             </Grid>
           </LocalizationProvider>

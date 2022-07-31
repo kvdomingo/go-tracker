@@ -1,5 +1,5 @@
-import { Provider } from "./provider";
 import { Moment } from "moment";
+import { Provider } from "./provider";
 
 export enum OrderStatus {
   UNPAID,
@@ -41,6 +41,8 @@ export interface GroupOrder {
   downpayment_deadline: number;
   payment_deadline: number;
   status: OrderStatus;
+  total_balance: number;
+  remaining_balance: number;
 }
 
 export interface GroupOrderForm {
@@ -52,6 +54,8 @@ export interface GroupOrderForm {
   downpayment_deadline: Moment | null;
   payment_deadline: Moment | null;
   status: OrderStatus;
+  total_balance: number;
+  remaining_balance: number;
 }
 
 export interface GroupOrderBody {
@@ -63,4 +67,6 @@ export interface GroupOrderBody {
   downpayment_deadline: number | null;
   payment_deadline: number;
   status: OrderStatus;
+  total_balance: number;
+  remaining_balance: number;
 }

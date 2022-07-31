@@ -55,11 +55,19 @@
     ]
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^3.3.0",
     "prettier": "^2.6.2"
   },
   "prettier": {
     "arrowParens": "avoid",
     "bracketSpacing": true,
+    "importOrder": [
+      "^react(.*)$",
+      "<THIRD_PARTY_MODULES>",
+      "^[./]"
+    ],
+    "importOrderSeparation": false,
+    "importOrderSortSpecifiers": true,
     "jsxSingleQuote": false,
     "printWidth": 120,
     "quoteProps": "consistent",
