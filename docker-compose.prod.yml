@@ -1,8 +1,9 @@
-version: '3.8'
-
 networks:
   gateway:
     external: true
+
+volumes:
+  db-data:
 
 services:
   backend:
@@ -27,19 +28,16 @@ services:
   proxy:
     image: bitnami/nginx:latest
     volumes:
-      - ./proxy/nginx.prod.conf:/opt/bitnami/nginx/conf/server_blocks/gotracker.conf:ro
+      - ./proxy/prod:/opt/bitnami/nginx/conf/server_blocks:ro
     environment:
       - NGINX_HTTP_PORT_NUMBER=${PORT}
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gotracker-dev.rule=Host(`go-tracker.localhost`)"
-      - "traefik.http.routers.gotracker-dev.entrypoints=http"
+      - "traefik.http.routers.gotracker.rule=Host(`go-tracker.localhost`)"
+      - "traefik.http.routers.gotracker.entrypoints=http"
       - "traefik.docker.network=gateway"
-      - "traefik.http.services.gotracker-dev.loadbalancer.server.port=${PORT}"
+      - "traefik.http.services.gotracker.loadbalancer.server.port=${PORT}"
     networks:
       - default
       - gateway
     restart: unless-stopped
-
-volumes:
-  db-data:

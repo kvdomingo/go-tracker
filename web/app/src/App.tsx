@@ -152,32 +152,34 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container maxWidth={false}>
-        <OrderTable
-          columns={columns}
-          showOrderDialog={() => {
-            setEditing("");
-            setShowOrderDialog(true);
-          }}
-          showProviderDialog={() => setShowProviderDialog(true)}
-        />
-        <OrderDialog
-          open={showOrderDialog}
-          onClose={() => {
-            setShowOrderDialog(false);
-            setEditing("");
-          }}
-          maxWidth="md"
-          fullWidth
-          editing={editing}
-        />
-        <ProviderDialog
-          open={showProviderDialog}
-          onClose={() => setShowProviderDialog(false)}
-          maxWidth="md"
-          fullWidth
-        />
-      </Container>
+      <Box sx={{ backgroundColor: "background.main" }}>
+        <Container maxWidth={false}>
+          <OrderTable
+            columns={columns}
+            showOrderDialog={() => {
+              setEditing("");
+              setShowOrderDialog(true);
+            }}
+            showProviderDialog={() => setShowProviderDialog(true)}
+          />
+          <OrderDialog
+            open={showOrderDialog}
+            onClose={() => {
+              setShowOrderDialog(false);
+              setEditing("");
+            }}
+            maxWidth="md"
+            fullWidth
+            editing={editing}
+          />
+          <ProviderDialog
+            open={showProviderDialog}
+            onClose={() => setShowProviderDialog(false)}
+            maxWidth="md"
+            fullWidth
+          />
+        </Container>
+      </Box>
     </ThemeProvider>
   );
 }

@@ -10,24 +10,25 @@ tasks:
   default:
     desc: Build and start prod Docker containers
     cmds:
-      - docker-compose -p $NAME -f docker-compose.prod.yml up -d --build --remove-orphans
+      - docker-compose -p {{.NAME}} -f docker-compose.prod.yml up -d --build --remove-orphans {{.CLI_ARGS}}
+      - task -t Taskfile.prod.yml logs
 
   logs:
     desc: Attach to prod Docker logs
     cmds:
-      - docker compose -p $NAME -f docker-compose.prod.yml logs --follow
+      - docker compose -p {{.NAME}} -f docker-compose.prod.yml logs --follow {{.CLI_ARGS}}
 
   shutdown:
     desc: Stop prod containers
     cmds:
-      - docker-compose -p $NAME -f docker-compose.prod.yml stop
+      - docker-compose -p {{.NAME}} -f docker-compose.prod.yml stop {{.CLI_ARGS}}
 
   restart:
     desc: Restart prod containers
     cmds:
-      - docker-compose -p $NAME -f docker-compose.prod.yml restart
+      - docker-compose -p {{.NAME}} -f docker-compose.prod.yml restart {{.CLI_ARGS}}
 
   clean:
     desc: Remove prod containers
     cmds:
-      - docker-compose -p $NAME -f docker-compose.prod.yml down --remove-orphans
+      - docker-compose -p {{.NAME}} -f docker-compose.prod.yml down --remove-orphans {{.CLI_ARGS}}

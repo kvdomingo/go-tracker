@@ -1,8 +1,11 @@
 import { createTheme, responsiveFontSizes } from "@mui/material";
 
 const theme = createTheme({
+  palette: {
+    mode: "dark",
+  },
   typography: {
-    fontFamily: ['"Rubik"', "sans-serif"].join(", "),
+    fontFamily: ['"Rubik"', '"Segoe UI Variable"', "sans-serif"].join(", "),
   },
 });
 
