@@ -20,7 +20,8 @@ function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
 
   return (
     <DataGrid
-      autoHeight
+      sx={{ height: "100vh" }}
+      autoPageSize
       columns={columns}
       rows={rows}
       components={{
