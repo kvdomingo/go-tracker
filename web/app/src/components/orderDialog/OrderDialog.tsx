@@ -50,7 +50,6 @@ function OrderDialog({ editing, ...props }: Props) {
     total_balance: false,
     remaining_balance: false,
   };
-
   const [form, setForm] = useState<GroupOrderForm>({ ...initialFormState });
   const [errors, setErrors] = useState<{ [key in keyof GroupOrderForm]: boolean }>({ ...initialErrorsState });
 

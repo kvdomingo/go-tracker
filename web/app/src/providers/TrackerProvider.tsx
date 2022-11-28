@@ -5,9 +5,12 @@ export const updateProviders = "updateProviders";
 
 export const updateOrders = "updateOrders";
 
+export const updateShowCompleted = "updateShowCompleted";
+
 const initialState: TrackerState = {
   providers: [],
   orders: [],
+  showCompleted: false,
 };
 
 const reducer = (state: TrackerState, action: PayloadAction) => {
@@ -17,6 +20,9 @@ const reducer = (state: TrackerState, action: PayloadAction) => {
     }
     case updateOrders: {
       return { ...state, orders: action.payload };
+    }
+    case updateShowCompleted: {
+      return { ...state, showCompleted: action.payload };
     }
     default: {
       return { ...state };

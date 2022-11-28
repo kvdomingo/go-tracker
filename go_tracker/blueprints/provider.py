@@ -1,51 +1,56 @@
-from flask import Blueprint, jsonify, Response, request
-from http import HTTPStatus as status
+from http import HTTPStatus
+
+from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
+
 from ..log import logger
 from ..models import Provider
-
 
 provider = Blueprint("provider", __name__)
 
 
-@provider.route("/api/provider", methods=["GET", "POST"])
-def list_providers():
+@provider.route("/api/provider", methods=["GET", "POST", "PATCH", "DELETE"], defaults={"pk": ""})
+@provider.route("/api/provider/<string:pk>", methods=["GET", "POST", "PATCH", "DELETE"])
+def provider_view(pk: str):
+    if pk and request.method == "POST":
+        return Response(status=HTTPStatus.METHOD_NOT_ALLOWED)
+    if not pk and request.method in ["PATCH", "DELETE"]:
+        return Response({"error": "Missing `pk`"}, status=HTTPStatus.BAD_REQUEST)
+
     match request.method:
         case "GET":
-            providers: list[Provider] = sorted([Provider.get(pk) for pk in Provider.all_pks()], key=lambda p: p.name)
-            return jsonify([provider.dict() for provider in providers])
+            if pk:
+                prov = Provider.get(pk)
+                return jsonify(prov.dict())
+            else:
+                providers: list[Provider] = sorted(
+                    [Provider.get(pk) for pk in Provider.all_pks()], key=lambda pv: pv.name
+                )
+                return jsonify([p.dict() for p in providers])
         case "POST":
             req = request.json
             if not req:
-                return Response("Error: empty body", status=status.BAD_REQUEST)
+                return Response({"error": "Empty body"}, status=HTTPStatus.BAD_REQUEST)
             try:
-                provider = Provider(**req)
-                match = Provider.find(Provider.name == provider.name).all()
+                prov = Provider(**req)
+                match = Provider.find(Provider.name == prov.name).all()
                 logger.info(match)
                 if len(match) > 0:
-                    return Response(f"Provider {provider.name} already exists", status=status.CONFLICT)
-                provider.save()
-                return Response(provider.json(), status=status.CREATED, content_type="application/json")
+                    return Response(f"Provider {prov.name} already exists", status=HTTPStatus.CONFLICT)
+                prov.save()
+                return Response(prov.json(), status=HTTPStatus.CREATED, content_type="application/json")
             except ValidationError as e:
-                return Response(str(e), status=status.BAD_REQUEST, content_type="application/json")
-
-
-@provider.route("/api/provider/<string:pk>", methods=["GET", "PATCH", "DELETE"])
-def op_provider(pk: str):
-    match request.method:
-        case "GET":
-            provider = Provider.get(pk)
-            return jsonify(provider.dict())
+                return Response(str(e), status=HTTPStatus.BAD_REQUEST, content_type="application/json")
         case "PATCH":
             req = request.json
             if not req:
-                return Response("Error: empty body", status=status.BAD_REQUEST)
+                return Response({"error": "Empty body"}, status=HTTPStatus.BAD_REQUEST)
             try:
-                provider = Provider.get(pk)
-                provider.update(**req)
-                return Response(provider.json(), status=status.OK, content_type="application/json")
+                prov = Provider.get(pk)
+                prov.update(**req)
+                return Response(prov.json(), status=HTTPStatus.OK, content_type="application/json")
             except ValidationError as e:
-                return Response(str(e), status=status.BAD_REQUEST, content_type="application/json")
+                return Response(str(e), status=HTTPStatus.BAD_REQUEST, content_type="application/json")
         case "DELETE":
             Provider.delete(pk)
-            return Response(status=status.NO_CONTENT)
+            return Response(status=HTTPStatus.NO_CONTENT)

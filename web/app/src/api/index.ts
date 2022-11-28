@@ -25,8 +25,8 @@ const api = {
     },
   },
   groupOrder: {
-    list(): Promise<AxiosResponse<GroupOrder[]>> {
-      return axi.get("/order");
+    list(showCompleted = false): Promise<AxiosResponse<GroupOrder[]>> {
+      return axi.get(`/order${showCompleted ? "?showCompleted=true" : ""}`);
     },
     get(pk: string): Promise<AxiosResponse<GroupOrder>> {
       return axi.get(`/order/${pk}`);

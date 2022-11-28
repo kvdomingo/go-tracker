@@ -5,6 +5,7 @@ import { Provider } from "../api/types/provider";
 export interface TrackerState {
   providers: Provider[];
   orders: GroupOrder[];
+  showCompleted: boolean;
 }
 
 export interface PayloadAction {
@@ -21,6 +22,7 @@ const TrackerContext = createContext<CreateTrackerContext>({
   state: {
     providers: [],
     orders: [],
+    showCompleted: false,
   },
   dispatch: () => {},
 });
