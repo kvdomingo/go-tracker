@@ -15,7 +15,7 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_OM_URL=${REDIS_OM_URL}
-    restart: unless-stopped
+    restart: on-failure
     depends_on:
       - redis
 
@@ -23,7 +23,7 @@ services:
     image: redis/redis-stack-server:latest
     volumes:
       - db-data:/data
-    restart: unless-stopped
+    restart: on-failure
 
   proxy:
     image: bitnami/nginx:latest
@@ -40,4 +40,4 @@ services:
     networks:
       - default
       - gateway
-    restart: unless-stopped
+    restart: on-failure
