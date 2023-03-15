@@ -1,10 +1,11 @@
 import os.path
+
 from flask import Flask, jsonify, send_from_directory
+
 from .blueprints import group_order, provider
 from .config import BASE_DIR, PYTHON_ENV
 
-
-app = Flask(__name__, static_url_path="", static_folder=BASE_DIR / "web" / "app")
+app = Flask(__name__, static_url_path="", static_folder=BASE_DIR / "ui")
 app.register_blueprint(provider)
 app.register_blueprint(group_order)
 

@@ -22,6 +22,7 @@ function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
     <DataGrid
       sx={{ height: "100vh", width: "100%" }}
       autoPageSize
+      disableRowSelectionOnClick
       columns={columns}
       rows={rows}
       slots={{
