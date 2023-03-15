@@ -24,8 +24,11 @@ function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
       autoPageSize
       columns={columns}
       rows={rows}
-      components={{
-        Toolbar: () => <OrderTableToolbar showOrderDialog={showOrderDialog} showProviderDialog={showProviderDialog} />,
+      slots={{
+        toolbar: OrderTableToolbar,
+      }}
+      slotProps={{
+        toolbar: { showOrderDialog, showProviderDialog },
       }}
       getRowId={(row: GroupOrder) => row.pk}
     />

@@ -216,17 +216,16 @@ function OrderDialog({ editing, ...props }: Props) {
                     })
                   }
                   value={form.order_date}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      name="order_date"
-                      variant="filled"
-                      fullWidth
-                      required
-                      error={errors.order_date}
-                      helperText={errors.order_date && "This field is required"}
-                    />
-                  )}
+                  slotProps={{
+                    textField: {
+                      name: "order_date",
+                      variant: "filled",
+                      fullWidth: true,
+                      required: true,
+                      error: errors.order_date,
+                      helperText: errors.order_date && "This field is required",
+                    },
+                  }}
                 />
               </Grid>
               <Grid item xs={6}>
@@ -239,9 +238,13 @@ function OrderDialog({ editing, ...props }: Props) {
                     })
                   }
                   value={form.downpayment_deadline}
-                  renderInput={params => (
-                    <TextField {...params} name="downpayment_deadline" variant="filled" fullWidth />
-                  )}
+                  slotProps={{
+                    textField: {
+                      name: "downpayment_deadline",
+                      variant: "filled",
+                      fullWidth: true,
+                    },
+                  }}
                   disablePast
                 />
               </Grid>
@@ -255,17 +258,16 @@ function OrderDialog({ editing, ...props }: Props) {
                     })
                   }
                   value={form.payment_deadline}
-                  renderInput={params => (
-                    <TextField
-                      {...params}
-                      name="payment_deadline"
-                      variant="filled"
-                      fullWidth
-                      required
-                      error={errors.payment_deadline}
-                      helperText={errors.payment_deadline && "This field is required"}
-                    />
-                  )}
+                  slotProps={{
+                    textField: {
+                      name: "payment_deadline",
+                      variant: "filled",
+                      fullWidth: true,
+                      required: true,
+                      error: errors.payment_deadline,
+                      helperText: errors.payment_deadline && "This field is required",
+                    },
+                  }}
                   disablePast
                 />
               </Grid>
