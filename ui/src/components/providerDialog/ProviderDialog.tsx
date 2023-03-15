@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogProps, DialogTitle, Grid, TextField } from "@mui/material";
-import { ProviderForm } from "../../api/types/provider";
 import api from "../../api";
+import { ProviderForm } from "../../api/types/provider";
 import { updateProviders, useTrackerContext } from "../../providers/TrackerProvider";
 
 interface Props extends DialogProps {}
@@ -20,6 +20,7 @@ function ProviderDialog({ ...props }: Props) {
   const [errors, setErrors] = useState<{ [key in keyof ProviderForm]: boolean }>({ ...initialErrorsState });
 
   function preSubmitValidate(e: any) {
+    e.preventDefault();
     const errors_ = { ...errors };
     (Object.keys(errors_) as (keyof ProviderForm)[]).forEach(key => {
       errors_[key] = !form[key];
@@ -101,15 +102,15 @@ function ProviderDialog({ ...props }: Props) {
             </Grid>
           </Grid>
         </DialogContent>
+        <DialogActions>
+          <Button color="inherit" variant="text" sx={{ color: "text.secondary" }} onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button color="primary" variant="text" onClick={preSubmitValidate} type="submit">
+            Add Provider
+          </Button>
+        </DialogActions>
       </form>
-      <DialogActions>
-        <Button color="inherit" variant="text" sx={{ color: "text.secondary" }} onClick={handleClose}>
-          Cancel
-        </Button>
-        <Button color="primary" variant="text" onClick={preSubmitValidate} type="submit">
-          Add Provider
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 }

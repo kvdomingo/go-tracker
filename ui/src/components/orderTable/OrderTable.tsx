@@ -20,7 +20,7 @@ function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
 
   return (
     <DataGrid
-      sx={{ height: "100vh" }}
+      sx={{ height: "100vh", width: "100%" }}
       autoPageSize
       columns={columns}
       rows={rows}
@@ -28,8 +28,6 @@ function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
         Toolbar: () => <OrderTableToolbar showOrderDialog={showOrderDialog} showProviderDialog={showProviderDialog} />,
       }}
       getRowId={(row: GroupOrder) => row.pk}
-      experimentalFeatures={{ newEditingApi: true }}
-      disableSelectionOnClick
     />
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
-import { Box, Container, ThemeProvider } from "@mui/material";
-import { GridActionsCellItem, GridColumns } from "@mui/x-data-grid";
+import { Box, Container } from "@mui/material";
+import { GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import dateFormat from "dateformat";
 import api from "./api";
 import { ReverseOrderStatus } from "./api/types/groupOrder";
@@ -9,14 +9,13 @@ import OrderDialog from "./components/orderDialog/OrderDialog";
 import OrderTable from "./components/orderTable/OrderTable";
 import ProviderDialog from "./components/providerDialog/ProviderDialog";
 import { updateOrders, updateProviders, useTrackerContext } from "./providers/TrackerProvider";
-import theme from "./themes";
 
 function App() {
   const { state, dispatch } = useTrackerContext();
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [showProviderDialog, setShowProviderDialog] = useState(false);
   const [editing, setEditing] = useState("");
-  const columns: GridColumns = [
+  const columns: GridColDef[] = [
     {
       field: "item",
       headerName: "Item",
@@ -159,34 +158,27 @@ function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container maxWidth={false}>
-        <OrderTable
-          columns={columns}
-          showOrderDialog={() => {
-            setEditing("");
-            setShowOrderDialog(true);
-          }}
-          showProviderDialog={() => setShowProviderDialog(true)}
-        />
-        <OrderDialog
-          open={showOrderDialog}
-          onClose={() => {
-            setShowOrderDialog(false);
-            setEditing("");
-          }}
-          maxWidth="md"
-          fullWidth
-          editing={editing}
-        />
-        <ProviderDialog
-          open={showProviderDialog}
-          onClose={() => setShowProviderDialog(false)}
-          maxWidth="md"
-          fullWidth
-        />
-      </Container>
-    </ThemeProvider>
+    <Container maxWidth={false}>
+      <OrderTable
+        columns={columns}
+        showOrderDialog={() => {
+          setEditing("");
+          setShowOrderDialog(true);
+        }}
+        showProviderDialog={() => setShowProviderDialog(true)}
+      />
+      <OrderDialog
+        open={showOrderDialog}
+        onClose={() => {
+          setShowOrderDialog(false);
+          setEditing("");
+        }}
+        maxWidth="md"
+        fullWidth
+        editing={editing}
+      />
+      <ProviderDialog open={showProviderDialog} onClose={() => setShowProviderDialog(false)} maxWidth="md" fullWidth />
+    </Container>
   );
 }
 
