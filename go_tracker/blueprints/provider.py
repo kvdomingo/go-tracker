@@ -6,11 +6,11 @@ from pydantic import ValidationError
 from ..log import logger
 from ..models import Provider
 
-provider = Blueprint("provider", __name__)
+provider = Blueprint("provider", __name__, url_prefix="/api/provider")
 
 
-@provider.route("/api/provider", methods=["GET", "POST", "PATCH", "DELETE"], defaults={"pk": ""})
-@provider.route("/api/provider/<string:pk>", methods=["GET", "POST", "PATCH", "DELETE"])
+@provider.route("", methods=["GET", "POST", "PATCH", "DELETE"], defaults={"pk": ""})
+@provider.route("<string:pk>", methods=["GET", "POST", "PATCH", "DELETE"])
 def provider_view(pk: str):
     if pk and request.method == "POST":
         return Response(status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -24,7 +24,8 @@ def provider_view(pk: str):
                 return jsonify(prov.dict())
             else:
                 providers: list[Provider] = sorted(
-                    [Provider.get(pk) for pk in Provider.all_pks()], key=lambda pv: pv.name
+                    [Provider.get(pk) for pk in Provider.all_pks()],
+                    key=lambda pv: pv.name,
                 )
                 return jsonify([p.dict() for p in providers])
         case "POST":
@@ -36,11 +37,22 @@ def provider_view(pk: str):
                 match = Provider.find(Provider.name == prov.name).all()
                 logger.info(match)
                 if len(match) > 0:
-                    return Response(f"Provider {prov.name} already exists", status=HTTPStatus.CONFLICT)
+                    return Response(
+                        f"Provider {prov.name} already exists",
+                        status=HTTPStatus.CONFLICT,
+                    )
                 prov.save()
-                return Response(prov.json(), status=HTTPStatus.CREATED, content_type="application/json")
+                return Response(
+                    prov.json(),
+                    status=HTTPStatus.CREATED,
+                    content_type="application/json",
+                )
             except ValidationError as e:
-                return Response(str(e), status=HTTPStatus.BAD_REQUEST, content_type="application/json")
+                return Response(
+                    str(e),
+                    status=HTTPStatus.BAD_REQUEST,
+                    content_type="application/json",
+                )
         case "PATCH":
             req = request.json
             if not req:
@@ -48,9 +60,15 @@ def provider_view(pk: str):
             try:
                 prov = Provider.get(pk)
                 prov.update(**req)
-                return Response(prov.json(), status=HTTPStatus.OK, content_type="application/json")
+                return Response(
+                    prov.json(), status=HTTPStatus.OK, content_type="application/json"
+                )
             except ValidationError as e:
-                return Response(str(e), status=HTTPStatus.BAD_REQUEST, content_type="application/json")
+                return Response(
+                    str(e),
+                    status=HTTPStatus.BAD_REQUEST,
+                    content_type="application/json",
+                )
         case "DELETE":
             Provider.delete(pk)
             return Response(status=HTTPStatus.NO_CONTENT)
