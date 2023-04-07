@@ -28,6 +28,11 @@ tasks:
     cmds:
       - docker-compose -p {{.NAME}} -f docker-compose.prod.yml restart {{.CLI_ARGS}}
 
+  exec:
+    desc: Run a command in the specified container
+    cmds:
+      - docker compose -p {{.NAME}} exec -- {{.CLI_ARGS}}
+
   clean:
     desc: Remove prod containers
     cmds:

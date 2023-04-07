@@ -3,8 +3,8 @@ from http import HTTPStatus
 from flask import Blueprint, Response, jsonify, request
 from pydantic import ValidationError
 
-from ..log import logger
-from ..models import Provider
+from go_tracker.logging import logger
+from go_tracker.models import Provider
 
 provider = Blueprint("provider", __name__, url_prefix="/api/provider")
 

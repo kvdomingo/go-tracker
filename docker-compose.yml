@@ -1,19 +1,43 @@
-networks:
-  gateway:
-    external: true
-
-volumes:
-  db-data:
-
 services:
   backend:
     build:
       context: .
-      dockerfile: dev.Dockerfile
+      dockerfile: Dockerfile.dev
     image: kvdomingo/go-tracker-api:latest
     env_file: .env
     volumes:
       - .:/backend
+    depends_on:
+      - redis
+
+  celery-worker:
+    image: kvdomingo/go-tracker-api:latest
+    env_file: .env
+    volumes:
+      - .:/backend
+    entrypoint:
+      - poetry
+      - run
+      - celery
+      - "-A"
+      - go_tracker.tasks
+      - worker
+      - "--loglevel=DEBUG"
+    depends_on:
+      - redis
+
+  celery-beat:
+    image: kvdomingo/go-tracker-api:latest
+    env_file: .env
+    volumes:
+      - .:/backend
+    entrypoint:
+      - poetry
+      - run
+      - celery
+      - "-A"
+      - go_tracker.tasks
+      - beat
     depends_on:
       - redis
 
@@ -59,3 +83,10 @@ services:
       - default
       - gateway
     restart: unless-stopped
+
+networks:
+  gateway:
+    external: true
+
+volumes:
+  db-data:

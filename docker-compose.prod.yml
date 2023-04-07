@@ -7,7 +7,9 @@ volumes:
 
 services:
   backend:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
     image: kvdomingo/go-tracker-prod:latest
     environment:
       - PORT=5000
@@ -16,6 +18,39 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_OM_URL=${REDIS_OM_URL}
     restart: on-failure
+    depends_on:
+      - redis
+
+  celery-worker:
+    image: kvdomingo/go-tracker-prod:latest
+    environment:
+      - PORT=5000
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_OM_URL=${REDIS_OM_URL}
+    entrypoint:
+      - celery
+      - "-A"
+      - go_tracker.tasks
+      - worker
+      - "--loglevel=INFO"
+    depends_on:
+      - redis
+
+  celery-beat:
+    image: kvdomingo/go-tracker-prod:latest
+    environment:
+      - PORT=5000
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_OM_URL=${REDIS_OM_URL}
+    entrypoint:
+      - celery
+      - "-A"
+      - go_tracker.tasks
+      - beat
     depends_on:
       - redis
 
