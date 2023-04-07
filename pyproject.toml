@@ -8,11 +8,11 @@ authors = ["Kenneth V. Domingo <hello@kvdomingo.xyz>"]
 python = "^3.10"
 Flask = "^2.1.2"
 gunicorn = {extras = ["gevent"], version = "^20.1.0"}
-python-dotenv = "^0.20.0"
+python-dotenv = "^1.0.0"
 loguru = "^0.6.0"
-redis = "^4.3.1"
-redis-om = "^0.0.27"
-pytz = "^2022.1"
+redis = "^4.5.4"
+redis-om = "^0.1.2"
+pytz = "^2023.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.3.0"
