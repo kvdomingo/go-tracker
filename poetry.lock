@@ -75,21 +75,6 @@ jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
-name = "blinker"
-version = "1.6"
-description = "Fast, simple object-to-object and broadcast signaling"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "blinker-1.6-py3-none-any.whl", hash = "sha256:eeebd5dfc782e1817fe4261ce79936c8c8cefb90d685caf50cec458029f773c1"},
-    {file = "blinker-1.6.tar.gz", hash = "sha256:5874afe21df4bae8885d31a0a6c4b5861910a575eae6176f051fbb9a6571481b"},
-]
-
-[package.dependencies]
-typing-extensions = "*"
-
-[[package]]
 name = "celery"
 version = "5.2.7"
 description = "Distributed Task Queue."
@@ -379,21 +364,6 @@ Werkzeug = ">=2.2.2"
 [package.extras]
 async = ["asgiref (>=3.2)"]
 dotenv = ["python-dotenv"]
-
-[[package]]
-name = "flask-mail"
-version = "0.9.1"
-description = "Flask extension for sending email"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
-]
-
-[package.dependencies]
-blinker = "*"
-Flask = "*"
 
 [[package]]
 name = "gevent"
@@ -1296,4 +1266,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "e2493c6002b26b1579018255cedf0fe53ab04658123bb4d5e2e99f9e03f867ee"
+content-hash = "80c44be1476ab9684e4536ad25a1e459c457eb72e4ba006f9de3ba44e389ed8a"

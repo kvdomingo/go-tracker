@@ -1,0 +1,48 @@
+<html lang="en">
+
+<head>
+  <title>{{ subject }}</title>
+
+  <style>
+      table, th, td {
+          text-align: left;
+      }
+
+      .text-right {
+          text-align: right;
+      }
+  </style>
+</head>
+
+<p>
+<p>Hi, </p>
+<p>This is to remind you that the following GOs are due for payment in less than 3 days:</p>
+
+<table>
+  <thead>
+  <tr>
+    <th>Item</th>
+    <th>Amount Due</th>
+    <th>Deadline</th>
+  </tr>
+  </thead>
+  <tbody>
+  {% for order in orders %}
+    <tr>
+      <td>{{ order['item'] }}</td>
+      <td class="text-right">
+        <pre>P{{ '%0.2f' % order['total_balance'] }}</pre>
+      </td>
+      <td>{{ order['payment_deadline'] }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<p>
+<pre>go-tracker</pre>
+</p>
+
+</body>
+
+</html>

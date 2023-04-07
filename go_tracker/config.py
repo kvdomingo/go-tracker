@@ -1,4 +1,5 @@
 import os
+from ast import literal_eval
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -17,9 +18,12 @@ REDIS_OM_URL = os.environ.get("REDIS_OM_URL")
 
 LOCAL_TZ = "Asia/Manila"
 
-MAIL_CONFIG = dict(
-    MAIL_SERVER=os.environ.get("MAIL_SERVER"),
-    MAIL_PORT=os.environ.get("MAIL_PORT"),
-    MAIL_USERNAME=os.environ.get("MAIL_USERNAME"),
-    MAIL_PASSWORD=os.environ.get("MAIL_PASSWORD"),
-)
+MAIL_SERVER = os.environ.get("MAIL_SERVER")
+
+MAIL_PORT = literal_eval(os.environ.get("MAIL_PORT"))
+
+MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+
+MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
+
+MAIL_RECIPIENT = os.environ.get("MAIL_RECIPIENT")
