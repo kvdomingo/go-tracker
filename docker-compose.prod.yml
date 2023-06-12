@@ -12,7 +12,7 @@ services:
       dockerfile: Dockerfile.prod
     image: kvdomingo/go-tracker-prod:latest
     env_file: .env.prod
-    restart: on-failure
+    restart: unless-stopped
     depends_on:
       - redis
 
@@ -25,6 +25,7 @@ services:
       - go_tracker.tasks
       - worker
       - "--loglevel=INFO"
+    restart: unless-stopped
     depends_on:
       - redis
 
@@ -36,6 +37,7 @@ services:
       - "-A"
       - go_tracker.tasks
       - beat
+    restart: unless-stopped
     depends_on:
       - redis
 
@@ -43,7 +45,7 @@ services:
     image: redis/redis-stack-server:latest
     volumes:
       - db-data:/data
-    restart: on-failure
+    restart: unless-stopped
 
   proxy:
     image: bitnami/nginx:latest
@@ -60,4 +62,4 @@ services:
     networks:
       - default
       - gateway
-    restart: on-failure
+    restart: unless-stopped
