@@ -54,7 +54,7 @@ def payment_deadline_reminder():
 
     logger.debug(to_remind)
 
-    text = f"""
+    text = """
 Hi,
 
 This is to remind you that the following GOs are due for payment in less than 2 days:
