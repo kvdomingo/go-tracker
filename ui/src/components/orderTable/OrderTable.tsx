@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { GroupOrder } from "../../api/types/groupOrder";
-import { useTrackerContext } from "../../providers/TrackerProvider";
+
+import { GroupOrder } from "@/api/types/groupOrder";
+import { useTrackerContext } from "@/providers/TrackerProvider";
+
 import OrderTableToolbar from "./OrderTableToolbar";
 
 interface Props {
@@ -11,23 +12,18 @@ interface Props {
 }
 
 function OrderTable({ columns, showOrderDialog, showProviderDialog }: Props) {
-  const { state } = useTrackerContext();
-  const [rows, setRows] = useState<GroupOrder[]>([]);
-
-  useEffect(() => {
-    setRows(state.orders);
-  }, [state.orders]);
+  const {
+    state: { orders },
+  } = useTrackerContext();
 
   return (
     <DataGrid
-      sx={{ height: "100vh", width: "100%" }}
+      className="h-full w-full"
       autoPageSize
       disableRowSelectionOnClick
       columns={columns}
-      rows={rows}
-      slots={{
-        toolbar: OrderTableToolbar,
-      }}
+      rows={orders}
+      slots={{ toolbar: OrderTableToolbar }}
       slotProps={{
         toolbar: { showOrderDialog, showProviderDialog },
       }}

@@ -1,5 +1,9 @@
-import { useContext, useReducer } from "react";
-import TrackerContext, { PayloadAction, TrackerState } from "../contexts/TrackerContext";
+import { useContext, useMemo, useReducer } from "react";
+
+import TrackerContext, {
+  PayloadAction,
+  TrackerState,
+} from "../contexts/TrackerContext";
 
 export const updateProviders = "updateProviders";
 
@@ -33,7 +37,11 @@ const reducer = (state: TrackerState, action: PayloadAction) => {
 function TrackerProvider({ children }: any) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  return <TrackerContext.Provider value={{ state, dispatch }}>{children}</TrackerContext.Provider>;
+  const value = useMemo(() => ({ state, dispatch }), [state]);
+
+  return (
+    <TrackerContext.Provider value={value}>{children}</TrackerContext.Provider>
+  );
 }
 
 const TrackerConsumer = TrackerContext.Consumer;
@@ -45,6 +53,11 @@ const trackerContextValue = {
   dispatch: reducer,
 };
 
-export { TrackerContext, TrackerConsumer, useTrackerContext, trackerContextValue };
+export {
+  TrackerContext,
+  TrackerConsumer,
+  useTrackerContext,
+  trackerContextValue,
+};
 
 export default TrackerProvider;

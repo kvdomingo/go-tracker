@@ -1,114 +1,128 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
-import { Box, Container } from "@mui/material";
+import { Box } from "@mui/material";
 import { GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import dateFormat from "dateformat";
+
 import api from "./api";
 import { ReverseOrderStatus } from "./api/types/groupOrder";
 import OrderDialog from "./components/orderDialog/OrderDialog";
 import OrderTable from "./components/orderTable/OrderTable";
 import ProviderDialog from "./components/providerDialog/ProviderDialog";
-import { updateOrders, updateProviders, useTrackerContext } from "./providers/TrackerProvider";
+import {
+  updateOrders,
+  updateProviders,
+  useTrackerContext,
+} from "./providers/TrackerProvider";
 
 function App() {
   const { state, dispatch } = useTrackerContext();
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [showProviderDialog, setShowProviderDialog] = useState(false);
   const [editing, setEditing] = useState("");
-  const columns: GridColDef[] = [
-    {
-      field: "item",
-      headerName: "Item",
-      flex: 2,
-      type: "string",
-    },
-    {
-      field: "provider",
-      headerName: "Provider",
-      flex: 1,
-      type: "string",
-      valueGetter: params => params.value.name,
-    },
-    {
-      field: "order_number",
-      headerName: "Order Number",
-      flex: 1,
-      type: "string",
-    },
-    {
-      field: "order_date",
-      headerName: "Order Date",
-      flex: 1,
-      type: "date",
-      valueFormatter: params => dateFormat(new Date(params.value), "dd mmm yyyy"),
-    },
-    {
-      field: "downpayment_deadline",
-      headerName: "Downpayment Deadline",
-      flex: 1,
-      type: "date",
-      valueFormatter: params => (params.value ? dateFormat(new Date(params.value), "dd mmm yyyy") : "N/A"),
-    },
-    {
-      field: "payment_deadline",
-      headerName: "Payment Deadline",
-      flex: 1,
-      type: "date",
-      valueFormatter: params => dateFormat(new Date(params.value), "dd mmm yyyy"),
-    },
-    {
-      field: "total_balance",
-      headerName: "Total Balance",
-      flex: 1,
-      type: "number",
-      valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
-    },
-    {
-      field: "remaining_balance",
-      headerName: "Remaining Balance",
-      flex: 1,
-      type: "number",
-      valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      flex: 1,
-      type: "string",
-      // editable: true,
-      renderCell: params => (
-        <Box
-          sx={{
-            display: "flex",
-            height: "100%",
-            width: "100%",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: ReverseOrderStatus[params.value].color,
-            color: "white",
-          }}
-        >
-          {ReverseOrderStatus[params.value].label.replace("_", " ")}
-        </Box>
-      ),
-    },
-    {
-      field: "pk",
-      headerName: "Actions",
-      type: "actions",
-      getActions: params => [
-        <GridActionsCellItem
-          icon={<EditIcon />}
-          label="Edit"
-          onClick={() => {
-            setEditing(params.id as string);
-            setShowOrderDialog(true);
-          }}
-        />,
-        <GridActionsCellItem icon={<DeleteIcon />} label="Delete" onClick={() => handleDelete(params.id as string)} />,
-      ],
-    },
-  ];
+  const columns: GridColDef[] = useMemo(
+    () => [
+      {
+        field: "item",
+        headerName: "Item",
+        flex: 2,
+        type: "string",
+      },
+      {
+        field: "provider",
+        headerName: "Provider",
+        flex: 1,
+        type: "string",
+        valueGetter: params => params.value.name,
+      },
+      {
+        field: "order_number",
+        headerName: "Order Number",
+        flex: 1,
+        type: "string",
+      },
+      {
+        field: "order_date",
+        headerName: "Order Date",
+        flex: 1,
+        type: "date",
+        valueFormatter: params =>
+          dateFormat(new Date(params.value), "dd mmm yyyy"),
+      },
+      {
+        field: "downpayment_deadline",
+        headerName: "Downpayment Deadline",
+        flex: 1,
+        type: "date",
+        valueFormatter: params =>
+          params.value
+            ? dateFormat(new Date(params.value), "dd mmm yyyy")
+            : "N/A",
+      },
+      {
+        field: "payment_deadline",
+        headerName: "Payment Deadline",
+        flex: 1,
+        type: "date",
+        valueFormatter: params =>
+          dateFormat(new Date(params.value), "dd mmm yyyy"),
+      },
+      {
+        field: "total_balance",
+        headerName: "Total Balance",
+        flex: 1,
+        type: "number",
+        valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
+      },
+      {
+        field: "remaining_balance",
+        headerName: "Remaining Balance",
+        flex: 1,
+        type: "number",
+        valueFormatter: ({ value }) => `P ${value.toFixed(2)}`,
+      },
+      {
+        field: "status",
+        headerName: "Status",
+        flex: 1,
+        type: "string",
+        renderCell: params => (
+          <Box
+            className="flex h-full w-full items-center justify-center text-white"
+            sx={{
+              backgroundColor: ReverseOrderStatus[params.value].color,
+            }}
+          >
+            {ReverseOrderStatus[params.value].label.replace("_", " ")}
+          </Box>
+        ),
+      },
+      {
+        field: "pk",
+        headerName: "Actions",
+        type: "actions",
+        getActions: params => [
+          <GridActionsCellItem
+            key={`edit-${params.id}`}
+            icon={<EditIcon />}
+            label="Edit"
+            onClick={() => {
+              setEditing(params.id as string);
+              setShowOrderDialog(true);
+            }}
+          />,
+          <GridActionsCellItem
+            key={`delete-${params.id}`}
+            icon={<DeleteIcon />}
+            label="Delete"
+            onClick={() => handleDelete(params.id as string)}
+          />,
+        ],
+      },
+    ],
+    [],
+  );
 
   useEffect(() => {
     api.provider
@@ -158,7 +172,7 @@ function App() {
   }
 
   return (
-    <Container maxWidth={false}>
+    <div className="mx-auto h-screen w-full px-8">
       <OrderTable
         columns={columns}
         showOrderDialog={() => {
@@ -177,8 +191,13 @@ function App() {
         fullWidth
         editing={editing}
       />
-      <ProviderDialog open={showProviderDialog} onClose={() => setShowProviderDialog(false)} maxWidth="md" fullWidth />
-    </Container>
+      <ProviderDialog
+        open={showProviderDialog}
+        onClose={() => setShowProviderDialog(false)}
+        maxWidth="md"
+        fullWidth
+      />
+    </div>
   );
 }
 
