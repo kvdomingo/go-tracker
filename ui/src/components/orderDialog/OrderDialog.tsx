@@ -1,4 +1,4 @@
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
 
 import {
   Button,
@@ -90,7 +90,8 @@ function OrderDialog({ editing, ...props }: Props) {
     }
   }
 
-  function preSubmitValidate(e: any) {
+  function preSubmitValidate(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     const errors_ = { ...errors };
     (Object.keys(errors_) as (keyof GroupOrderForm)[]).forEach(key => {
       if (typeof form[key] === "number") {
@@ -390,12 +391,7 @@ function OrderDialog({ editing, ...props }: Props) {
           >
             Cancel
           </Button>
-          <Button
-            color="primary"
-            variant="text"
-            onClick={preSubmitValidate}
-            type="submit"
-          >
+          <Button color="primary" variant="text" type="submit">
             Save
           </Button>
         </DialogActions>

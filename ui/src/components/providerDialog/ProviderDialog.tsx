@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 import {
   Button,
@@ -35,7 +35,7 @@ function ProviderDialog({ ...props }: Props) {
     [key in keyof ProviderForm]: boolean;
   }>({ ...initialErrorsState });
 
-  function preSubmitValidate(e: any) {
+  function preSubmitValidate(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const errors_ = { ...errors };
     (Object.keys(errors_) as (keyof ProviderForm)[]).forEach(key => {
@@ -129,12 +129,7 @@ function ProviderDialog({ ...props }: Props) {
           >
             Cancel
           </Button>
-          <Button
-            color="primary"
-            variant="text"
-            onClick={preSubmitValidate}
-            type="submit"
-          >
+          <Button color="primary" variant="text" type="submit">
             Save
           </Button>
         </DialogActions>

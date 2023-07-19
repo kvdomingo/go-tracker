@@ -11,7 +11,6 @@ tasks:
     desc: Build and start prod Docker containers
     cmds:
       - docker-compose -p {{.NAME}} -f docker-compose.prod.yml up -d --build --remove-orphans {{.CLI_ARGS}}
-      - task -t Taskfile.prod.yml logs
 
   logs:
     desc: Attach to prod Docker logs
