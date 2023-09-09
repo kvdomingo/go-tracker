@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { Box } from "@mui/material";
@@ -7,7 +7,7 @@ import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import dateFormat from "dateformat";
 
-import api from "@/api";
+import api, { queryClient } from "@/api";
 import OrderDialog from "@/components/orderDialog/OrderDialog";
 import OrderTable from "@/components/orderTable/OrderTable";
 import ProviderDialog from "@/components/providerDialog/ProviderDialog";
@@ -20,6 +20,10 @@ function App() {
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [showProviderDialog, setShowProviderDialog] = useState(false);
   const [editing, setEditing] = useState("");
+
+  useEffect(() => {
+    void queryClient.invalidateQueries(["orders"]);
+  }, [showCompleted]);
 
   const columns: GridColDef[] = useMemo(
     () => [

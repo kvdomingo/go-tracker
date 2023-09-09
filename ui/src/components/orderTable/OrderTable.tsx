@@ -23,7 +23,9 @@ function OrderTable({
   showCompleted,
   setShowCompleted,
 }: Props) {
-  const query = useQuery(["orders"], () => api.groupOrder.list(showCompleted));
+  const query = useQuery(["orders", { showCompleted }], () =>
+    api.groupOrder.list(showCompleted),
+  );
   const orders = query.data?.data ?? [];
 
   return (
