@@ -1,16 +1,16 @@
-FROM node:16-alpine AS build
+FROM oven/bun:1.0 AS build
 
 WORKDIR /tmp
 
 COPY ./ui/ ./
 
-RUN yarn install && yarn build
+RUN bun install && bun run build
 
 FROM python:3.10-bullseye AS base
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
-ENV POETRY_VERSION 1.3.2
+ENV POETRY_VERSION 1.6.1
 
 WORKDIR /tmp
 
@@ -18,7 +18,7 @@ RUN pip install "poetry==$POETRY_VERSION"
 
 COPY pyproject.toml poetry.lock ./
 
-RUN poetry export --without-hashes -f requirements.txt | pip install --no-cache-dir -r /dev/stdin
+RUN poetry export --without-hashes --without dev -f requirements.txt | pip install --no-cache-dir -r /dev/stdin
 
 WORKDIR /backend
 
@@ -28,4 +28,4 @@ COPY ./*.py ./
 
 EXPOSE $PORT
 
-ENTRYPOINT [ "gunicorn", "--bind", "0.0.0.0:5000", "--config", "gunicorn.conf.py" ]
+CMD [ "gunicorn", "--bind", "0.0.0.0:5000", "--config", "gunicorn.conf.py" ]

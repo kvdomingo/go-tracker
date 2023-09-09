@@ -11,6 +11,7 @@ services:
       context: .
       dockerfile: Dockerfile.prod
     image: kvdomingo/go-tracker-prod:latest
+    init: true
     env_file: .env.prod
     restart: unless-stopped
     depends_on:
@@ -19,7 +20,8 @@ services:
   celery-worker:
     image: kvdomingo/go-tracker-prod:latest
     env_file: .env.prod
-    entrypoint:
+    init: true
+    command:
       - celery
       - "-A"
       - go_tracker.tasks
@@ -28,11 +30,13 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+      - backend
 
   celery-beat:
     image: kvdomingo/go-tracker-prod:latest
     env_file: .env.prod
-    entrypoint:
+    init: true
+    command:
       - celery
       - "-A"
       - go_tracker.tasks
@@ -40,6 +44,7 @@ services:
     restart: unless-stopped
     depends_on:
       - redis
+      - backend
 
   redis:
     image: redis/redis-stack-server:latest
@@ -64,3 +69,5 @@ services:
       - default
       - gateway
     restart: unless-stopped
+    depends_on:
+      - backend

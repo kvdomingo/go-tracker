@@ -87,6 +87,9 @@ services:
       - default
       - gateway
     restart: unless-stopped
+    depends_on:
+      - backend
+      - frontend
 
 networks:
   gateway:
