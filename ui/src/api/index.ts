@@ -1,6 +1,8 @@
+import { QueryClient } from "@tanstack/react-query";
 import axios, { AxiosResponse } from "axios";
-import { GroupOrder, GroupOrderBody } from "./types/groupOrder";
-import { Provider, ProviderForm } from "./types/provider";
+
+import { GroupOrder, GroupOrderBody } from "@/types/groupOrder";
+import { Provider, ProviderForm } from "@/types/provider";
 
 const baseURL = "/api";
 
@@ -20,7 +22,11 @@ const api = {
     delete(pk: string): Promise<AxiosResponse<null>> {
       return axi.delete(`/provider/${pk}`);
     },
-    partialUpdate(pk: string, key: keyof Provider, value: Provider[keyof Provider]): Promise<AxiosResponse<Provider>> {
+    partialUpdate(
+      pk: string,
+      key: keyof Provider,
+      value: Provider[keyof Provider],
+    ): Promise<AxiosResponse<Provider>> {
       return axi.patch(`/provider/${pk}`, { [key]: value });
     },
   },
@@ -44,10 +50,15 @@ const api = {
     ): Promise<AxiosResponse<GroupOrder>> {
       return axi.patch(`/order/${pk}`, { [key]: value });
     },
-    update(pk: string, data: GroupOrderBody): Promise<AxiosResponse<GroupOrder>> {
+    update(
+      pk: string,
+      data: GroupOrderBody,
+    ): Promise<AxiosResponse<GroupOrder>> {
       return axi.patch(`/order/${pk}`, data);
     },
   },
 };
 
 export default api;
+
+export const queryClient = new QueryClient();

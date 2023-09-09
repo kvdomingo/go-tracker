@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 
 import {
   Button,
@@ -18,24 +18,38 @@ import {
 } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import moment from "moment";
 
-import api from "@/api";
+import api, { queryClient } from "@/api";
 import {
   GroupOrderBody,
   GroupOrderForm,
   OrderStatus,
   ReverseOrderStatus,
-} from "@/api/types/groupOrder";
-import TrackerContext from "@/contexts/TrackerContext";
-import { updateOrders } from "@/providers/TrackerProvider";
+} from "@/types/groupOrder";
 
 interface Props extends DialogProps {
   editing: string;
+  showCompleted: boolean;
 }
 
-function OrderDialog({ editing, ...props }: Props) {
-  const { state, dispatch } = useContext(TrackerContext);
+function OrderDialog({ editing, showCompleted, ...props }: Props) {
+  const providerQuery = useQuery(["providers"], api.provider.list);
+  const orderQuery = useQuery(["orders"], () =>
+    api.groupOrder.list(showCompleted),
+  );
+  const createOrderMutation = useMutation(["orders"], api.groupOrder.create);
+  const updateOrderMutation = useMutation(
+    ["orders"],
+    ({ pk, data }: { pk: string; data: GroupOrderBody }) =>
+      api.groupOrder.update(pk, data),
+  );
+
+  const providers = providerQuery.data?.data ?? [];
+  const orders = orderQuery.data?.data ?? [];
+
   const initialFormState = {
     order_number: "",
     item: "",
@@ -65,9 +79,9 @@ function OrderDialog({ editing, ...props }: Props) {
 
   useEffect(() => {
     if (editing) {
-      const init_ = state.orders.find(o => o.pk === editing)!;
+      const init_ = orders.find(o => o.pk === editing)!;
       const editingInitialFormState: GroupOrderForm = {
-        ...state.orders.find(o => o.pk === editing)!,
+        ...orders.find(o => o.pk === editing)!,
         order_date: moment(init_.order_date),
         downpayment_deadline: init_.downpayment_deadline
           ? moment(init_.downpayment_deadline)
@@ -77,7 +91,7 @@ function OrderDialog({ editing, ...props }: Props) {
       delete editingInitialFormState.pk;
       setForm(editingInitialFormState);
     }
-  }, [editing, state.orders]);
+  }, [editing, orders]);
 
   function handleChange(
     e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
@@ -111,20 +125,6 @@ function OrderDialog({ editing, ...props }: Props) {
     setErrors({ ...initialErrorsState });
   }
 
-  function getOrders() {
-    api.groupOrder
-      .list()
-      .then(res =>
-        dispatch({
-          type: updateOrders,
-          payload: res.data,
-        }),
-      )
-      .catch(err => {
-        console.error(err.message);
-      });
-  }
-
   function handleSubmit(e: any) {
     const form_: GroupOrderBody = {
       ...form,
@@ -134,15 +134,12 @@ function OrderDialog({ editing, ...props }: Props) {
         : null,
       payment_deadline: form.payment_deadline!.unix().valueOf() * 1000,
     };
-    api.groupOrder
-      .create(form_)
-      .then(() => {
-        getOrders();
-        handleClose(e);
-      })
-      .catch(err => {
-        console.error(err.message);
-      });
+
+    createOrderMutation.mutate(form_, {
+      onSuccess: () => handleClose(e),
+      onError: err => console.error((err as AxiosError).message),
+      onSettled: () => queryClient.invalidateQueries(["orders"]),
+    });
   }
 
   function handleUpdateOrder(e: any) {
@@ -154,17 +151,19 @@ function OrderDialog({ editing, ...props }: Props) {
         : null,
       payment_deadline: form.payment_deadline!.unix().valueOf() * 1000,
     };
-    api.groupOrder
-      .update(editing, form_)
-      .then(() => {
-        getOrders();
-        handleClose(e);
-      })
-      .catch(err => console.error(err));
+
+    updateOrderMutation.mutate(
+      { pk: editing, data: form_ },
+      {
+        onSuccess: () => handleClose(e),
+        onError: err => console.error((err as AxiosError).message),
+        onSettled: () => queryClient.invalidateQueries(["orders"]),
+      },
+    );
   }
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} onClose={handleClose}>
       <DialogTitle>{editing ? "Edit Order" : "Add Order"}</DialogTitle>
       <form onSubmit={preSubmitValidate}>
         <DialogContent>
@@ -213,18 +212,18 @@ function OrderDialog({ editing, ...props }: Props) {
                       onChange={e =>
                         setForm({
                           ...form,
-                          provider: state.providers.find(
+                          provider: providers.find(
                             p => p.pk === e.target.value,
                           )!,
                         })
                       }
                     >
-                      {state.providers.length === 0 && (
+                      {providers.length === 0 && (
                         <MenuItem value="noop" disabled>
                           No shops available
                         </MenuItem>
                       )}
-                      {state.providers.map(provider => (
+                      {providers.map(provider => (
                         <MenuItem key={provider.pk} value={provider.pk}>
                           {provider.name}
                         </MenuItem>

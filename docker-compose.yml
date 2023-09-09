@@ -1,9 +1,8 @@
 services:
   backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    image: kvdomingo/go-tracker-api:latest
+    build: .
+    image: kvdomingo/go-tracker/api
+    init: true
     env_file: .env
     volumes:
       - .:/backend
@@ -11,11 +10,12 @@ services:
       - redis
 
   celery-worker:
-    image: kvdomingo/go-tracker-api:latest
+    image: kvdomingo/go-tracker/api
     env_file: .env
     volumes:
       - .:/backend
-    entrypoint:
+    init: true
+    command:
       - poetry
       - run
       - celery
@@ -25,13 +25,15 @@ services:
       - "--loglevel=DEBUG"
     depends_on:
       - redis
+      - backend
 
   celery-beat:
-    image: kvdomingo/go-tracker-api:latest
+    image: kvdomingo/go-tracker/api
     env_file: .env
     volumes:
       - .:/backend
-    entrypoint:
+    init: true
+    command:
       - poetry
       - run
       - celery
@@ -40,16 +42,18 @@ services:
       - beat
     depends_on:
       - redis
+      - backend
 
   frontend:
-    image: node:16-alpine
+    image: oven/bun:1.0
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
     working_dir: /web
-    entrypoint:
+    init: true
+    command:
       - /bin/sh
       - "-c"
-      - "yarn install && exec yarn dev --host 0.0.0.0 --port 3000"
+      - "bun install && bun run dev"
     volumes:
       - ./ui:/web
 

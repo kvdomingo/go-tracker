@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 import { Add as AddIcon } from "@mui/icons-material";
 import {
   Box,
@@ -15,29 +17,19 @@ import {
   GridToolbarFilterButton,
 } from "@mui/x-data-grid";
 
-import {
-  updateShowCompleted,
-  useTrackerContext,
-} from "@/providers/TrackerProvider";
-
 interface Props {
   showOrderDialog: () => void;
   showProviderDialog: () => void;
+  showCompleted: boolean;
+  setShowCompleted: Dispatch<SetStateAction<boolean>>;
 }
 
-function OrderTableToolbar({ showOrderDialog, showProviderDialog }: Props) {
-  const {
-    state: { showCompleted },
-    dispatch,
-  } = useTrackerContext();
-
-  function handleToggleShowCompleted() {
-    dispatch({
-      type: updateShowCompleted,
-      payload: !showCompleted,
-    });
-  }
-
+function OrderTableToolbar({
+  showOrderDialog,
+  showProviderDialog,
+  showCompleted,
+  setShowCompleted,
+}: Props) {
   return (
     <GridToolbarContainer>
       <Grid item xs>
@@ -51,7 +43,7 @@ function OrderTableToolbar({ showOrderDialog, showProviderDialog }: Props) {
               <Switch
                 size="small"
                 checked={showCompleted}
-                onChange={handleToggleShowCompleted}
+                onChange={() => setShowCompleted(prev => !prev)}
               />
             }
             label={

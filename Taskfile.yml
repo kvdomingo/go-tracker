@@ -17,7 +17,7 @@ tasks:
     cmds:
       - docker compose -p {{.NAME}} logs --follow {{.CLI_ARGS}}
 
-  shutdown:
+  stop:
     desc: Stop containers
     cmds:
       - docker compose -p {{.NAME}} stop {{.CLI_ARGS}}
@@ -31,6 +31,11 @@ tasks:
     desc: Run a command in the specified container
     cmds:
       - docker compose -p {{.NAME}} exec -- {{.CLI_ARGS}}
+
+  reload-proxy:
+    desc: Reload nginx configuration
+    cmds:
+      - task exec -- proxy nginx -s reload
 
   clean:
     desc: Remove containers

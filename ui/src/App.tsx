@@ -1,26 +1,26 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Delete as DeleteIcon, Edit as EditIcon } from "@mui/icons-material";
 import { Box } from "@mui/material";
 import { GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import dateFormat from "dateformat";
 
-import api from "./api";
-import { ReverseOrderStatus } from "./api/types/groupOrder";
-import OrderDialog from "./components/orderDialog/OrderDialog";
-import OrderTable from "./components/orderTable/OrderTable";
-import ProviderDialog from "./components/providerDialog/ProviderDialog";
-import {
-  updateOrders,
-  updateProviders,
-  useTrackerContext,
-} from "./providers/TrackerProvider";
+import api from "@/api";
+import OrderDialog from "@/components/orderDialog/OrderDialog";
+import OrderTable from "@/components/orderTable/OrderTable";
+import ProviderDialog from "@/components/providerDialog/ProviderDialog";
+import { ReverseOrderStatus } from "@/types/groupOrder";
 
 function App() {
-  const { state, dispatch } = useTrackerContext();
+  const deleteOrderMutation = useMutation(["orders"], api.groupOrder.delete);
+
+  const [showCompleted, setShowCompleted] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [showProviderDialog, setShowProviderDialog] = useState(false);
   const [editing, setEditing] = useState("");
+
   const columns: GridColDef[] = useMemo(
     () => [
       {
@@ -124,51 +124,13 @@ function App() {
     [],
   );
 
-  useEffect(() => {
-    api.provider
-      .list()
-      .then(res => {
-        dispatch({
-          type: updateProviders,
-          payload: res.data,
-        });
-      })
-      .catch(err => console.error(err));
-  }, [dispatch]);
-
-  useEffect(() => {
-    api.groupOrder
-      .list(state.showCompleted)
-      .then(res => {
-        dispatch({
-          type: updateOrders,
-          payload: res.data,
-        });
-      })
-      .catch(err => console.error(err));
-  }, [dispatch, state.showCompleted]);
-
   function handleDelete(pk: string) {
-    api.groupOrder
-      .delete(pk)
-      .then(() => {
-        api.groupOrder
-          .list()
-          .then(res =>
-            dispatch({
-              type: updateOrders,
-              payload: res.data,
-            }),
-          )
-          .catch(err => {
-            console.error(err.message);
-            alert("A network error occurred.");
-          });
-      })
-      .catch(err => {
-        console.error(err.message);
+    deleteOrderMutation.mutate(pk, {
+      onError: err => {
+        console.error((err as AxiosError).message);
         alert("A network error occurred.");
-      });
+      },
+    });
   }
 
   return (
@@ -180,6 +142,8 @@ function App() {
           setShowOrderDialog(true);
         }}
         showProviderDialog={() => setShowProviderDialog(true)}
+        showCompleted={showCompleted}
+        setShowCompleted={setShowCompleted}
       />
       <OrderDialog
         open={showOrderDialog}
@@ -190,6 +154,7 @@ function App() {
         maxWidth="md"
         fullWidth
         editing={editing}
+        showCompleted={showCompleted}
       />
       <ProviderDialog
         open={showProviderDialog}

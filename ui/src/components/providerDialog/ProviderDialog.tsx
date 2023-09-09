@@ -10,18 +10,15 @@ import {
   Grid,
   TextField,
 } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
-import api from "@/api";
-import { ProviderForm } from "@/api/types/provider";
-import {
-  updateProviders,
-  useTrackerContext,
-} from "@/providers/TrackerProvider";
+import api, { queryClient } from "@/api";
+import { ProviderForm } from "@/types/provider";
 
-interface Props extends DialogProps {}
+function ProviderDialog({ ...props }: DialogProps) {
+  const mutation = useMutation(["providers"], api.provider.create);
 
-function ProviderDialog({ ...props }: Props) {
-  const { dispatch } = useTrackerContext();
   const initialFormState = {
     name: "",
     website: "",
@@ -52,32 +49,15 @@ function ProviderDialog({ ...props }: Props) {
     setForm(form => ({ ...form, [name]: value }));
   }
 
-  function getProviders() {
-    api.provider
-      .list()
-      .then(res =>
-        dispatch({
-          type: updateProviders,
-          payload: res.data,
-        }),
-      )
-      .catch(err => {
-        console.error(err);
-        alert("A network error occurred.");
-      });
-  }
-
   function handleSubmit(e: any) {
-    api.provider
-      .create(form)
-      .then(() => {
-        getProviders();
-        handleClose(e);
-      })
-      .catch(err => {
-        console.error(err.message);
+    mutation.mutate(form, {
+      onSuccess: () => handleClose(e),
+      onError: err => {
+        console.error((err as AxiosError).message);
         alert("A network error occurred.");
-      });
+      },
+      onSettled: () => queryClient.invalidateQueries(["providers"]),
+    });
   }
 
   function handleClose(e: any) {
@@ -87,7 +67,7 @@ function ProviderDialog({ ...props }: Props) {
   }
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} onClose={handleClose}>
       <DialogTitle>Add Shop</DialogTitle>
       <form onSubmit={preSubmitValidate}>
         <DialogContent>

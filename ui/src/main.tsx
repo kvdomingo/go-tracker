@@ -10,20 +10,21 @@ import {
   StyledEngineProvider,
   ThemeProvider,
 } from "@mui/material";
+import { QueryClientProvider } from "@tanstack/react-query";
 
-import App from "./App";
-import "./index.css";
-import TrackerProvider from "./providers/TrackerProvider";
-import theme from "./theme";
+import App from "@/App";
+import { queryClient } from "@/api";
+import "@/index.css";
+import theme from "@/theme";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <TrackerProvider>
+        <QueryClientProvider client={queryClient}>
           <App />
-        </TrackerProvider>
+        </QueryClientProvider>
       </ThemeProvider>
     </StyledEngineProvider>
   </React.StrictMode>,
