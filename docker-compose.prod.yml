@@ -62,7 +62,6 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.gotracker.rule=Host(`go-tracker.localhost`)"
       - "traefik.http.routers.gotracker.entrypoints=http"
-      - "traefik.http.routers.gotracker.middlewares=secured@file"
       - "traefik.docker.network=gateway"
       - "traefik.http.services.gotracker.loadbalancer.server.port=${PORT}"
     networks:
