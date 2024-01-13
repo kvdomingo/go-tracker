@@ -14,7 +14,11 @@ REDIS_HOST = os.environ.get("REDIS_HOST", "redis")
 
 REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
 
-REDIS_OM_URL = os.environ.get("REDIS_OM_URL")
+REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
+
+REDIS_OM_URL = f"redis://:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}"
+
+os.environ.setdefault("REDIS_OM_URL", REDIS_OM_URL)
 
 LOCAL_TZ = "Asia/Manila"
 
