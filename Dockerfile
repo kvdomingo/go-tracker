@@ -1,17 +1,11 @@
-FROM python:3.10-bullseye
+FROM cosmtrek/air:v1.51.0
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV POETRY_VERSION 1.3.2
+WORKDIR /app
 
-WORKDIR /tmp
+COPY api/go.mod api/go.sum ./
 
-RUN pip install "poetry==$POETRY_VERSION" && poetry config virtualenvs.create false
+RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest && \
+    go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest && \
+    go mod download
 
-COPY pyproject.toml poetry.lock ./
-
-RUN poetry install
-
-WORKDIR /backend
-
-CMD [ "flask", "run", "--host=0.0.0.0", "--port=5000" ]
+CMD [ "air", "-c", ".air.toml" ]

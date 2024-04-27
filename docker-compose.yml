@@ -1,51 +1,18 @@
 services:
-  backend:
+  api:
     build: .
-    image: kvdomingo/go-tracker/api
+    image: kvdomingo/go-tracker-api
     init: true
     env_file: .env
     volumes:
-      - .:/backend
+      - ./api:/app
+    ports:
+      - "8000:8000"
     depends_on:
-      - redis
+      - postgres
 
-  celery-worker:
-    image: kvdomingo/go-tracker/api
-    env_file: .env
-    volumes:
-      - .:/backend
-    init: true
-    command:
-      - poetry
-      - run
-      - celery
-      - "-A"
-      - go_tracker.tasks
-      - worker
-      - "--loglevel=DEBUG"
-    depends_on:
-      - redis
-      - backend
-
-  celery-beat:
-    image: kvdomingo/go-tracker/api
-    env_file: .env
-    volumes:
-      - .:/backend
-    init: true
-    command:
-      - poetry
-      - run
-      - celery
-      - "-A"
-      - go_tracker.tasks
-      - beat
-    depends_on:
-      - redis
-      - backend
-
-  frontend:
-    image: oven/bun:1.0
+  ui:
+    image: oven/bun:1.1
     environment:
       NODE_ENV: development
     working_dir: /web
@@ -53,47 +20,25 @@ services:
     command:
       - /bin/sh
       - "-c"
-      - "bun install && bun run dev"
+      - "bun install && exec bun run dev"
     volumes:
       - ./ui:/web
 
   redis:
     image: redis/redis-stack:latest
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.gotracker-redisinsight-dev.rule=Host(`redisinsight.go-tracker-dev.localhost`)"
-      - "traefik.http.routers.gotracker-redisinsight-dev.entrypoints=http"
-      - "traefik.docker.network=gateway"
-      - "traefik.http.services.gotracker-redisinsight-dev.loadbalancer.server.port=8001"
+    ports:
+      - "8001:8001"
     volumes:
       - db-data:/data
-    networks:
-      - default
-      - gateway
 
-  proxy:
-    image: bitnami/nginx:latest
+  postgres:
+    image: bitnami/postgresql:16.2.0-debian-12-r17
+    env_file: .env
+    ports:
+      - "5432:5432"
     volumes:
-      - ./proxy/dev:/opt/bitnami/nginx/conf/server_blocks:ro
-    environment:
-      - NGINX_HTTP_PORT_NUMBER=8000
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.gotracker-dev.rule=Host(`go-tracker-dev.localhost`)"
-      - "traefik.http.routers.gotracker-dev.entrypoints=http"
-      - "traefik.docker.network=gateway"
-      - "traefik.http.services.gotracker-dev.loadbalancer.server.port=8000"
-    networks:
-      - default
-      - gateway
-    restart: unless-stopped
-    depends_on:
-      - backend
-      - frontend
-
-networks:
-  gateway:
-    external: true
+      - postgres-data:/bitnami/postgresql
 
 volumes:
   db-data:
+  postgres-data:
