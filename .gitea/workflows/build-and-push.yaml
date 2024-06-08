@@ -1,0 +1,84 @@
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    name: Build and push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify build started
+        uses: Ilshidur/action-discord@0.3.2
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: Build started
+
+      - name: Checkout code repo
+        uses: actions/checkout@v4
+        with:
+          path: main
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          registry: git.lab.kvd.studio
+          username: ${{ gitea.repository_owner }}
+          password: ${{ secrets.GCR_PASSWORD }}
+
+      - name: Setup Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - uses: dcarbone/install-yq-action@v1.1.1
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: git.lab.kvd.studio/${{ gitea.repository }}:${{ gitea.sha }}
+          context: main
+
+      - name: Update ssh config
+        run: |
+          cat <<EOF > $HOME/.ssh/config
+          Host git.lab.kvd.studio
+            Port 3322
+            User git
+          EOF
+
+      - name: Checkout manifest repo
+        uses: actions/checkout@v4
+        with:
+          repository: r/homelab
+          path: manifest
+          ref: main
+          ssh-key: ${{ secrets.SSH_KEY }}
+          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: Update manifests
+        working-directory: manifest
+        run: |
+          yq eval ".image.tag = \"${{ gitea.sha }}\"" --inplace go-tracker/values.yaml
+
+      - name: Commit and push manifest repo
+        uses: EndBug/add-and-commit@v9
+        with:
+          cwd: manifest
+          message: "Update GO Tracker release tag to ${{ gitea.sha }}"
+          push: true
+
+      - name: Notify build started
+        uses: Ilshidur/action-discord@0.3.2
+        if: success()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: Build success
+
+      - name: Notify build started
+        uses: Ilshidur/action-discord@0.3.2
+        if: failure()
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: Build failed
